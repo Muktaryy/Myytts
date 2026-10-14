@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Muktaryy — Voice Studio</title>
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    :root {
+      --bg: #090705;
+      --card-bg: #120c07;
+      --header-bg: #160f09;
+      --surface: #1b130c;
+      --surface-hover: #261b11;
+      --border: #2c1d12;
+      --border-light: #3c2718;
+      --primary: #f59e0b;
+      --primary-hover: #fbbf24;
+      --primary-dark: #d97706;
+      --text: #f3ece4;
+      --text-muted: #8e7d70;
+      --green: #22c55e;
+      --red: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      min-height: 100dvh;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* =================================================================
+       FULL-SCREEN APP SHELL
+       ================================================================= */
+    .app-shell {
+      width: 100%;
+      min-height: 100dvh;
+      background: radial-gradient(circle at 50% 15%, rgba(245, 158, 11, 0.07) 0%, var(--card-bg) 70%);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* =================================================================
+       1. STICKY TOP HEADER (Muktaryy Profile Icon + Nav + Ping)
+       ================================================================= */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(22, 15, 9, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand-profile {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .avatar-ring {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      padding: 2px;
+      background: linear-gradient(135deg, var(--primary), #b45309);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
+      flex-shrink: 0;
+    }
+
+    .brand-logo {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #000;
+      display: block;
+    }
+
+    .avatar-status-dot {
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--green);
+      border: 2px solid var(--header-bg);
+    }
+
+    .brand-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .brand-info h1 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .brand-info span {
+      font-size: 11px;
+      color: var(--primary);
+      font-family: monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      opacity: 0.85;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* Desktop/Tablet Navigation Pills inside Header */
+    .header-nav {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 4px;
+      border-radius: 999px;
+    }
+    .header-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 999px;
+      transition: all 0.15s;
+      cursor: pointer;
+      user-select: none;
+    }
+    .header-nav a:hover {
+      color: var(--text);
+    }
+    .header-nav a.active {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--primary);
+    }
+
+    .motion-pill-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .motion-pill-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .latency-pill {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: var(--green);
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: monospace;
+    }
+    .latency-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+    }
+
+    /* =================================================================
+       2. MAIN WORKSPACE GRID (Mobile: Stacked | Tablet & Desktop: Split)
+       ================================================================= */
+    .studio-workspace {
+      flex: 1;
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 14px 16px 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Teacher Stage (Top Banner on Mobile, Right Card on Tablet/Desktop) */
+    .visual-stage {
+      order: -1;
+      width: 100%;
+      background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.12) 0%, rgba(27, 19, 12, 0.45) 75%);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 6px 10px 8px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stage-badge-hint {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: monospace;
+      margin-top: -2px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .stage-badge-hint i {
+      color: var(--primary);
+    }
+
+    #online-learning-svg {
+      width: 100%;
+      max-height: 180px;
+      height: auto;
+      user-select: none;
+      display: block;
+    }
+
+    /* Controls Column */
+    .controls-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      width: 100%;
+    }
+
+    .hero-title {
+      display: none;
+      font-size: 40px;
+      font-weight: 800;
+      line-height: 1.06;
+      letter-spacing: -0.02em;
+    }
+    .hero-title span {
+      color: var(--primary);
+    }
+
+    /* =================================================================
+       3. FORM CONTROLS (Script, 6 Language Presets, Dropdown, Player)
+       ================================================================= */
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
+
+    .section-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .input-box {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .input-box:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.12);
+    }
+
+    textarea {
+      width: 100%;
+      height: 76px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      line-height: 1.45;
+      padding-right: 24px;
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px;
+      transition: color 0.15s;
+    }
+    .clear-btn:hover { color: var(--text); }
+
+    /* 6-Language Quick Presets */
+    .presets-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .preset-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 10.5px;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 5px 9px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .preset-chip:hover, .preset-chip.active {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    /* Custom Voice Dropdown */
+    .custom-select-trigger {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 13px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.15s;
+    }
+    .custom-select-trigger:hover, .custom-select-trigger.open {
+      border-color: var(--primary);
+    }
+    .custom-select-trigger .trigger-text {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .custom-select-trigger .trigger-arrow {
+      color: var(--text-muted);
+      font-size: 12px;
+      transition: transform 0.2s ease;
+    }
+    .custom-select-trigger.open .trigger-arrow {
+      transform: rotate(180deg);
+      color: var(--primary);
+    }
+
+    .custom-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: #17100a;
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      padding: 6px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.92);
+      max-height: 250px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .custom-dropdown-menu.show {
+      display: flex;
+      animation: menuFade 0.15s ease-out;
+    }
+    @keyframes menuFade {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .custom-dropdown-menu::-webkit-scrollbar { width: 4px; }
+    .custom-dropdown-menu::-webkit-scrollbar-thumb {
+      background: var(--border-light);
+      border-radius: 4px;
+    }
+
+    .dropdown-group-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--primary);
+      padding: 7px 8px 3px 8px;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .dropdown-item:hover {
+      background: var(--surface-hover);
+      color: #fff;
+    }
+    .dropdown-item.selected {
+      background: rgba(245, 158, 11, 0.14);
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .dropdown-item .item-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .dropdown-item .item-code {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+    .dropdown-item.selected .item-code {
+      color: rgba(245, 158, 11, 0.75);
+    }
+    .dropdown-item .check-icon {
+      font-size: 14px;
+      opacity: 0;
+    }
+    .dropdown-item.selected .check-icon {
+      opacity: 1;
+    }
+
+    /* Generate Button */
+    .btn-generate {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #0c0805;
+      font-size: 14px;
+      font-weight: 700;
+      border: none;
+      border-radius: 14px;
+      padding: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.1s ease, filter 0.15s ease;
+      box-shadow: 0 6px 18px rgba(245, 158, 11, 0.25);
+    }
+    .btn-generate:hover { filter: brightness(1.08); }
+    .btn-generate:active { transform: scale(0.98); }
+    .btn-generate:disabled {
+      background: #2b1f15;
+      color: #7d6553;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin-icon { display: inline-block; animation: spin 1s linear infinite; }
+
+    /* Custom Player Card */
+    .player-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .player-card.active {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .player-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+    }
+    .voice-tag-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .voice-tag {
+      color: var(--primary);
+      font-family: monospace;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .eq-visualizer {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      height: 14px;
+    }
+    .eq-bar {
+      width: 2.5px;
+      background-color: var(--primary);
+      border-radius: 999px;
+      height: 4px;
+      transition: height 0.15s ease;
+    }
+    @keyframes eqBar {
+      0%, 100% { height: 4px; }
+      50% { height: 14px; }
+    }
+    .speaking-bars .eq-bar:nth-child(1) { animation: eqBar 0.45s ease-in-out infinite; }
+    .speaking-bars .eq-bar:nth-child(2) { animation: eqBar 0.45s ease-in-out 0.12s infinite; }
+    .speaking-bars .eq-bar:nth-child(3) { animation: eqBar 0.45s ease-in-out 0.24s infinite; }
+    .speaking-bars .eq-bar:nth-child(4) { animation: eqBar 0.45s ease-in-out 0.08s infinite; }
+
+    .player-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .icon-btn {
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+      transition: color 0.15s;
+      background: none;
+      border: none;
+    }
+    .icon-btn:hover { color: var(--text); }
+
+    .speed-badge-btn {
+      background: #2b1d12;
+      border: 1px solid var(--border);
+      color: var(--primary);
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: monospace;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.15s;
+    }
+    .speed-badge-btn:hover {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: var(--primary);
+    }
+
+    .player-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .play-circle-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #0c0805;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.1s;
+    }
+    .play-circle-btn:active { transform: scale(0.93); }
+
+    .track-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .seek-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      border-radius: 2px;
+      background: #2b1f15;
+      outline: none;
+      cursor: pointer;
+    }
+    .seek-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 0 6px var(--primary);
+    }
+    .time-readout {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+
+    .status-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      min-height: 16px;
+      font-family: monospace;
+    }
+
+    /* =================================================================
+       SVG ANIMATIONS
+       ================================================================= */
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+    @keyframes floatReverse {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(5px); }
+    }
+    @keyframes pulseGentle {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    @keyframes dotBounce {
+      0%, 100% { transform: translateY(0); opacity: 0.5; }
+      50% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    .anim-enabled .float-node-1 { animation: floatSlow 4.2s ease-in-out infinite; }
+    .anim-enabled .float-node-2 { animation: floatReverse 4.8s ease-in-out 0.4s infinite; }
+    .anim-enabled .float-node-3 { animation: floatSlow 5.1s ease-in-out 0.8s infinite; }
+    .anim-enabled .float-node-4 { animation: floatReverse 4.5s ease-in-out 1.2s infinite; }
+    .anim-enabled .float-tri { animation: pulseGentle 3.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+
+    .speaking-active .speech-dot-1 { animation: dotBounce 0.6s ease-in-out infinite; }
+    .speaking-active .speech-dot-2 { animation: dotBounce 0.6s ease-in-out 0.15s infinite; }
+    .speaking-active .speech-dot-3 { animation: dotBounce 0.6s ease-in-out 0.3s infinite; }
+    .speaking-active .speech-dot-4 { animation: dotBounce 0.6s ease-in-out 0.45s infinite; }
+
+    .svg-badge {
+      cursor: pointer;
+      transition: filter 0.2s ease;
+    }
+    .svg-badge:hover {
+      filter: drop-shadow(0 8px 16px rgba(245, 158, 11, 0.4));
+    }
+
+    .hidden { display: none !important; }
+
+    /* =================================================================
+       TABLET BREAKPOINT (min-width: 768px)
+       ================================================================= */
+    @media (min-width: 768px) {
+      .app-header {
+        padding: 14px 28px;
+      }
+
+      .header-nav {
+        display: flex;
+      }
+
+      .studio-workspace {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        gap: 28px;
+        padding: 28px;
+      }
+
+      .visual-stage {
+        order: 2;
+        height: auto;
+        align-self: center;
+        padding: 24px 18px;
+      }
+
+      #online-learning-svg {
+        max-height: 360px;
+      }
+
+      .hero-title {
+        display: block;
+        font-size: 34px;
+      }
+
+      .status-note {
+        text-align: left;
+      }
+    }
+
+    /* =================================================================
+       DESKTOP BREAKPOINT (min-width: 1024px)
+       ================================================================= */
+    @media (min-width: 1024px) {
+      .app-header {
+        padding: 16px 48px;
+      }
+
+      .brand-info h1 {
+        font-size: 17px;
+      }
+
+      .studio-workspace {
+        grid-template-columns: 5fr 7fr;
+        gap: 48px;
+        padding: 36px 48px;
+      }
+
+      .hero-title {
+        font-size: 46px;
+        margin-bottom: 2px;
+      }
+
+      textarea {
+        height: 92px;
+        font-size: 14.5px;
+      }
+
+      .visual-stage {
+        padding: 32px 24px;
+        border-radius: 24px;
+      }
+
+      #online-learning-svg {
+        max-height: 440px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-shell">
+    <!-- ===============================================================
+         1. FULL-WIDTH TOP HEADER (Muktaryy Only)
+         =============================================================== -->
+    <header class="app-header">
+      <div class="brand-profile">
+        <div class="avatar-ring">
+          <img
+            src="https://i.postimg.cc/MTGJ6zYs/18275-modified.png"
+            alt="Muktaryy Profile"
+            class="brand-logo"
+            onerror="this.src='https://api.iconify.design/bi:soundwave.svg?color=%23f59e0b'"
+          >
+          <span class="avatar-status-dot" id="avatarDot"></span>
+        </div>
+        <div class="brand-info">
+          <h1>Muktaryy</h1>
+          <span>@muktaryy • voice studio</span>
+        </div>
+      </div>
+
+      <!-- Center Language Navigation Pills (Tablet & Desktop) -->
+      <nav class="header-nav">
+        <a id="nav-so" onclick="triggerPresetClick('so')">Somali</a>
+        <a id="nav-sv" class="active" onclick="triggerPresetClick('sv')">Swedish</a>
+        <a id="nav-en" onclick="triggerPresetClick('en')">English</a>
+        <a id="nav-de" onclick="triggerPresetClick('de')">German</a>
+        <a id="nav-ar" onclick="triggerPresetClick('ar')">Arabic</a>
+        <a id="nav-no" onclick="triggerPresetClick('no')">Norwegian</a>
+      </nav>
+
+      <!-- Right Actions: Motion Toggle + Live Latency Pill -->
+      <div class="header-actions">
+        <button class="motion-pill-btn" onclick="toggleFloatAnim()" title="Toggle Character Motion">
+          <i class="bi bi-magic"></i> <span id="motionLabel">Motion</span>
+        </button>
+        <div class="latency-pill" id="pingBadge" title="Voice Engine Status">
+          <span class="latency-dot" id="pingDot"></span>
+          <span id="pingValue">Ready</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===============================================================
+         2. MAIN STUDIO WORKSPACE
+         =============================================================== -->
+    <main class="studio-workspace">
+
+      <!-- LEFT COLUMN: VOICE STUDIO CONTROLS -->
+      <section class="controls-panel">
+        <h2 class="hero-title">Text to <span>Speech</span></h2>
+
+        <!-- Script Input -->
+        <div class="field-group">
+          <div class="section-label">
+            <span><i class="bi bi-chat-left-text"></i> Script</span>
+            <span id="charCount">44 chars</span>
+          </div>
+          <div class="input-box">
+            <textarea id="scriptInput" dir="ltr" placeholder="Type text to synthesize...">Välkommen till din muntliga engelska övning.</textarea>
+            <button class="clear-btn" title="Clear text" onclick="clearText()"><i class="bi bi-x-circle"></i></button>
+          </div>
+        </div>
+
+        <!-- 6 Language Presets -->
+        <div class="presets-row">
+          <span style="font-size:10px; color:var(--text-muted); font-weight:700;">TRY:</span>
+          <button class="preset-chip" id="chip-so" onclick="applyPreset('so', this)"><i class="bi bi-translate"></i> Somali</button>
+          <button class="preset-chip active" id="chip-sv" onclick="applyPreset('sv', this)"><i class="bi bi-globe"></i> Swedish</button>
+          <button class="preset-chip" id="chip-en" onclick="applyPreset('en', this)"><i class="bi bi-mortarboard"></i> English</button>
+          <button class="preset-chip" id="chip-de" onclick="applyPreset('de', this)"><i class="bi bi-chat-dots"></i> German</button>
+          <button class="preset-chip" id="chip-ar" onclick="applyPreset('ar', this)"><i class="bi bi-moon-stars"></i> Arabic</button>
+          <button class="preset-chip" id="chip-no" onclick="applyPreset('no', this)"><i class="bi bi-compass"></i> Norwegian</button>
+        </div>
+
+        <!-- Custom Voice Selector (6 Languages, Male & Female) -->
+        <div class="field-group" id="voiceDropdownGroup">
+          <div class="section-label">
+            <span><i class="bi bi-person-bounding-box"></i> Neural Voice</span>
+            <span style="font-family: monospace; font-size: 10.5px; color: var(--primary);" id="activeVoiceBadge">SV • MATTIAS</span>
+          </div>
+
+          <div class="custom-select-trigger" id="voiceTrigger" onclick="toggleVoiceDropdown()">
+            <span class="trigger-text" id="selectedVoiceText">
+              Mattias (Male) — Swedish
+            </span>
+            <i class="bi bi-chevron-down trigger-arrow"></i>
+          </div>
+
+          <div class="custom-dropdown-menu" id="voiceMenu">
+            <!-- Somali -->
+            <div class="dropdown-group-label">Somali (Soomaali)</div>
+            <div class="dropdown-item" data-value="so-SO-MuuseNeural" data-badge="SO • MUUSE" data-rtl="false" data-label="Muuse (Male) — Somali">
+              <div class="item-meta">
+                <span>Muuse (Male)</span>
+                <span class="item-code">Somali Studio Voice</span>
+              </div>
+              <i class="bi bi-check2 check-icon"></i>
+            </div>
+            <div class="dropdown-item" data-value="so-SO-UbaxNeural" data-badge="SO • UBAX" data-rtl="false" data-label="Ubax (Female) — Somali">
+              <div class="item-meta">
+                <span>Ubax (Female)</span>
+                <span class="item-code">Somali Studio Voice</span>
+              </div>
+              <i class="bi bi-check2 check-icon"></i>
+            </div>
+
+            <!-- Swedish -->
+            <div class="dropdown-group-label">Swedish (Svenska)</div>
+            <div class="dropdown-item selected" data-value="sv-SE-MattiasNeural" data-badge="SV • MATTIAS" data-rtl="false" data-label="Mattias (Male) — Swedish">
+              <div class="item-meta">
+                <span>Mattias (Male)</span>
+                <span class="item-code">Swedish Studio Voice</span>
+              </div>
+              <i class="bi bi-check2 check-icon"></i>
+            </div>
+            <div class="dropdown-item" data-value="sv-SE-SofieNeural" data-badge="SV • SOFIE" data-rtl="false" data-label="Sofie (Female) — Swedish">
+              <div class="item-meta">
+                <span>Sofie (Female)</span>
+                <span class="item-code">Swedish Studio Voice</span>
+              </div>
+              <i class="bi bi-check2 check-icon"></i>
+            </div>
+
+            <!-- English -->
+            <div class="dropdown-group-label">English (UK &amp; US)</div>
+            <div class="dropdown-item" data-value="en-GB-RyanNeural" data-badge="EN • RYAN" data-rtl="false" data-label="Ryan (UK Male) — English">
+              <div class="item-meta">
+                <span>Ryan (UK Male)</span>
+                <span class="item-code">British Studio Voice</span>
+              </div>
+              <i class="bi bi-check2 check-icon"></i>
+            </div>
+            <div class="dropdown-item" data-value="en-GB-SoniaNeural" data-badge="EN • SONIA" data-rtl="false" data-label="Sonia (UK Female) — English">
+              <div class="item-meta">
+                <span>Sonia (UK Female)</span>
+                <span class="item-code">British Studio Voice</span>
+              </div>
+              <i class="bi bi-check2 check-icon"></i>
+            </div>
+            <div class="dropdown-item" data-value="en-US-GuyNeural" data-badge="EN • GUY" data-rtl="false" data-label="Guy (US Male) — English">
+              <div class="item-meta">
+                <span>Guy (US Male)</span>
+                <span class="item-code">American Studio Voice</span>
+              </div>
+              <i class="bi bi-check2 check-icon"></i>
+            </div>
+            <div class="dropdown-item" data-value="en-US-JennyNeural" data-badge="EN • JENNY" data-rtl="false" data-label="Jenny (US Female) — English">
+              <div class="item-meta">
+                <span>Jenny (US Female)</span>
+                <span class="item-code">American Studio Voice</span>
+              </div>
+              <i class="bi bi-check2 check-icon"></i>
+            </div>
+
+            <!-- German -->
+            <div class="dropdown-group-label">German (Deutsch)</div>
+            <div class="dropdown-item" data-value="de-DE-ConradNeural" data-badge="DE • CONRAD" data-rtl="false" data-label="Conrad (Male) — German">
+              <div class="item-meta">
+                <span>Conrad (Male)</span>
+                <span class="item-code">German Studio Voice</span>
+              </div>
+              <i class="bi bi-check2 check-icon"></i>
+            </div>
+            <div class="dropdown-item" data-value="de-DE-KatjaNeural" data-badge="DE • KATJA" data-rtl="false" data-label="Katja (Female) — German">
+              <div class="item-meta">
+                <span>Katja (Female)</span>
+                <span class="item-code">German Studio Voice</span>
+              </div>
+              <i class="bi bi-check2 check-icon"></i>
+            </div>
+
+            <!-- Arabic -->
+            <div class="dropdown-group-label">Arabic (العربية)</div>
+            <div class="dropdown-item" data-value="ar-SA-HamedNeural" data-badge="AR • HAMED" data-rtl="true" data-label="Hamed (Male) — Arabic">
+              <div class="item-meta">
+                <span>Hamed (Male)</span>
+                <span class="item-code">Arabic Studio Voice</span>
+              </div>
+              <i class="bi bi-check2 check-icon"></i>
+            </div>
+            <div class="dropdown-item" data-value="ar-SA-ZariyahNeural" data-badge="AR • ZARIYAH" data-rtl="true" data-label="Zariyah (Female) — Arabic">
+              <div class="item-meta">
+                <span>Zariyah (Female)</span>
+                <span class="item-code">Arabic Studio Voice</span>
+              </div>
+              <i class="bi bi-check2 check-icon"></i>
+            </div>
+
+            <!-- Norwegian -->
+            <div class="dropdown-group-label">Norwegian (Norsk)</div>
+            <div class="dropdown-item" data-value="nb-NO-FinnNeural" data-badge="NO • FINN" data-rtl="false" data-label="Finn (Male) — Norwegian">
+              <div class="item-meta">
+                <span>Finn (Male)</span>
+                <span class="item-code">Norwegian Studio Voice</span>
+              </div>
+              <i class="bi bi-check2 check-icon"></i>
+            </div>
+            <div class="dropdown-item" data-value="nb-NO-PernilleNeural" data-badge="NO • PERNILLE" data-rtl="false" data-label="Pernille (Female) — Norwegian">
+              <div class="item-meta">
+                <span>Pernille (Female)</span>
+                <span class="item-code">Norwegian Studio Voice</span>
+              </div>
+              <i class="bi bi-check2 check-icon"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Primary Action Button -->
+        <button class="btn-generate" id="generateBtn" onclick="generateAndPlay()">
+          <i class="bi bi-play-circle-fill"></i> Generate &amp; Play
+        </button>
+
+        <!-- Seekable Audio Player Tray -->
+        <div class="player-card" id="playerCard">
+          <div class="player-meta">
+            <div class="voice-tag-wrap">
+              <span class="voice-tag" id="playerVoiceTag">
+                <i class="bi bi-soundwave"></i> <span id="currentVoiceLabel">SV • MATTIAS</span>
+              </span>
+              <div id="eqVisualizer" class="eq-visualizer">
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+              </div>
+            </div>
+
+            <div class="player-actions">
+              <button class="speed-badge-btn" id="speedToggleBtn" title="Change speed" onclick="cyclePlaybackRate()">
+                <i class="bi bi-speedometer2"></i> <span id="speedValueLabel">1.0×</span>
+              </button>
+              <a class="icon-btn" id="downloadBtn" download="muktaryy-voice.mp3" title="Download MP3"><i class="bi bi-download"></i></a>
+            </div>
+          </div>
+
+          <div class="player-controls">
+            <button class="play-circle-btn" id="togglePlayBtn" onclick="togglePlay()">
+              <i class="bi bi-play-fill" id="playIcon"></i>
+            </button>
+            <div class="track-wrap">
+              <input type="range" class="seek-slider" id="seekSlider" value="0" min="0" max="100" step="0.1">
+              <div class="time-readout">
+                <span id="currentTime">0:00</span>
+                <span id="durationTime">0:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="status-note" id="statusMessage">Studio ready</div>
+      </section>
+
+      <!-- =============================================================
+           TALKING TEACHER STAGE (Mobile, Tablet, AND Desktop)
+           ============================================================= -->
+      <section class="visual-stage">
+        <svg
+          id="online-learning-svg"
+          viewBox="80 40 500 410"
+          class="anim-enabled"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <clipPath id="mainCircleClip">
+              <circle cx="340" cy="252" r="158" />
+            </clipPath>
+            <clipPath id="characterPopOutClip">
+              <path d="M 190 40 H 490 V 300 H 190 Z" />
+            </clipPath>
+            <radialGradient id="amberCircleGrad" cx="50%" cy="35%" r="65%">
+              <stop offset="0%" stop-color="#f59e0b" />
+              <stop offset="100%" stop-color="#b45309" />
+            </radialGradient>
+          </defs>
+
+          <!-- LAYER 1: OUTER DASHED ORBIT RING & FLOATING ACCENTS -->
+          <g id="layer-orbit-ring">
+            <circle cx="340" cy="252" r="172" stroke="#523722" stroke-width="1.6" stroke-dasharray="4 6" />
+            <polygon class="float-tri" points="116,238 111,274 143,259" fill="#fbbf24" opacity="0.85" />
+            <polygon class="float-tri" points="406,63 434,72 415,96" fill="#f59e0b" />
+            <polygon class="float-tri" points="544,244 576,251 554,279" fill="#fbbf24" opacity="0.85" />
+            <polygon class="float-tri" points="374,398 411,421 372,440" fill="#d97706" />
+            <polygon class="float-tri" points="265,414 277,435 254,435" fill="#fbbf24" />
+
+            <circle cx="147" cy="202" r="7.5" fill="#f59e0b" />
+            <circle cx="456" cy="77" r="4" fill="#fbbf24" />
+            <circle cx="534" cy="285" r="12" fill="#d97706" opacity="0.7" />
+            <circle cx="232" cy="420" r="6.5" fill="#f59e0b" />
+          </g>
+
+          <!-- LAYER 2: CENTRAL SPLIT CIRCLE -->
+          <g id="layer-main-circle" clip-path="url(#mainCircleClip)">
+            <circle cx="340" cy="252" r="158" fill="url(#amberCircleGrad)" />
+            <rect x="170" y="322" width="340" height="100" fill="#1b130c" />
+          </g>
+
+          <!-- LAYER 3: DESKTOP MONITOR & TALKING TEACHER -->
+          <g id="layer-monitor-and-teacher">
+            <rect x="321" y="326" width="38" height="33" fill="#3c2718" />
+            <rect x="321" y="326" width="38" height="7" fill="#261b11" />
+            <rect x="289" y="355" width="102" height="7.5" rx="2" fill="#523722" />
+
+            <rect x="182" y="165" width="316" height="164" rx="12" fill="#090705" stroke="#3c2718" stroke-width="2" />
+            <rect x="195" y="175" width="290" height="125" fill="#1b130c" />
+
+            <path
+              d="M 182 303 H 498 V 321 C 498 326.5 493.5 331 488 331 H 192 C 186.5 331 182 326.5 182 321 V 303 Z"
+              fill="#261b11"
+            />
+            <line x1="182" y1="303" x2="498" y2="303" stroke="#f59e0b" stroke-width="1.5" opacity="0.6" />
+            <circle cx="340" cy="317" r="4.5" fill="#f59e0b" />
+
+            <!-- TEACHER CHARACTER -->
+            <g id="layer-teacher" clip-path="url(#characterPopOutClip)">
+              <path
+                d="M 294 128 C 272 138, 275 168, 266 188 C 256 210, 250 232, 257 254 L 415 254 C 418 228, 410 205, 400 186 C 392 168, 392 142, 372 128 Z"
+                fill="#0c0805"
+              />
+              <path
+                d="M 262 214 C 278 205, 305 203, 336 203 C 367 203, 392 205, 408 214 L 452 280 C 457 288, 452 298, 440 298 L 228 298 C 214 298, 206 286, 214 273 Z"
+                fill="#fde68a"
+              />
+              <path d="M 275 244 L 258 265 M 272 268 L 315 262" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" />
+              <path d="M 398 242 L 414 268" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" />
+              <polygon points="274,268 286,298 260,298" fill="#fcd34d" opacity="0.55" />
+              <polygon points="400,264 414,298 392,298" fill="#fcd34d" opacity="0.55" />
+
+              <path d="M 310 203 L 336 226 L 362 203 Z" fill="#FFBDA3" />
+              <path d="M 323 184 H 349 V 211 H 323 Z" fill="#FFBDA3" />
+              <path d="M 323 190 Q 336 201 349 190 Z" fill="#E89378" />
+              <path d="M 322 211 Q 336 216 350 211" stroke="#E89378" stroke-width="1.5" fill="none" stroke-linecap="round" />
+
+              <ellipse cx="304" cy="162" rx="6" ry="9" transform="rotate(-10 304 162)" fill="#FFBDA3" />
+              <ellipse cx="368" cy="162" rx="6" ry="9" transform="rotate(10 368 162)" fill="#FFBDA3" />
+
+              <path
+                d="M 306 140 C 306 122, 366 122, 366 140 V 165 C 366 184, 352 195, 336 195 C 320 195, 306 184, 306 165 Z"
+                fill="#FFBDA3"
+              />
+
+              <circle cx="317" cy="169" r="6.5" fill="#f59e0b" opacity="0.3" />
+              <circle cx="355" cy="169" r="6.5" fill="#f59e0b" opacity="0.3" />
+
+              <path
+                d="M 301 153 C 298 126, 318 112, 344 114 C 366 115, 376 130, 371 153 C 366 140, 357 132, 348 128 C 338 140, 319 146, 301 153 Z"
+                fill="#0c0805"
+              />
+
+              <path d="M 314 148 Q 322 144 329 147" stroke="#0c0805" stroke-width="2.3" stroke-linecap="round" fill="none" />
+              <path d="M 344 147 Q 351 144 358 148" stroke="#0c0805" stroke-width="2.3" stroke-linecap="round" fill="none" />
+
+              <ellipse cx="322" cy="157" rx="2.4" ry="3.2" fill="#0c0805" />
+              <ellipse cx="351" cy="157" rx="2.4" ry="3.2" fill="#0c0805" />
+              <circle cx="321" cy="155.8" r="0.9" fill="#FFFFFF" />
+              <circle cx="350" cy="155.8" r="0.9" fill="#FFFFFF" />
+
+              <path d="M 337 155 L 339 166 L 334 167" stroke="#E2886C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+
+              <!-- Animated Mouth for Lip-Sync -->
+              <path id="teacher-mouth-idle" d="M 331 176 Q 336 173 341 176 Q 336 181 331 176 Z" fill="#c2410c" />
+              <ellipse id="teacher-mouth-talk" cx="336" cy="176.5" rx="4.8" ry="1.8" fill="#9a3412" class="hidden" />
+
+              <!-- Glasses -->
+              <rect x="309" y="149" width="24" height="16" rx="5" stroke="#fef3c7" stroke-width="2.2" fill="#FFFFFF" fill-opacity="0.12" />
+              <rect x="340" y="149" width="24" height="16" rx="5" stroke="#fef3c7" stroke-width="2.2" fill="#FFFFFF" fill-opacity="0.12" />
+              <path d="M 333 156 Q 336.5 154 340 156" stroke="#fef3c7" stroke-width="2.2" fill="none" />
+
+              <!-- 3D Letter "A" -->
+              <g id="prop-letter-a">
+                <path d="M 340 218 L 365 218 L 388 294 L 365 294 L 360 276 L 328 276 L 322 294 L 304 294 Z" fill="#b45309" />
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M 333 218 H 356 L 379 294 H 359 L 354 276 H 324 L 319 294 H 299 L 333 218 Z M 330 258 H 349 L 340 232 L 330 258 Z"
+                  fill="#f59e0b"
+                />
+                <polygon points="340,232 345,232 352,258 349,258" fill="#b45309" />
+              </g>
+
+              <!-- Hands -->
+              <g id="left-hand">
+                <path d="M 290 256 C 296 250, 315 248, 324 252 C 327 255, 327 274, 318 277 C 308 280, 292 276, 288 268 Z" fill="#FFBDA3" />
+                <line x1="306" y1="257" x2="324" y2="258" stroke="#E58E73" stroke-width="1.6" stroke-linecap="round" />
+                <line x1="305" y1="264" x2="324" y2="265" stroke="#E58E73" stroke-width="1.6" stroke-linecap="round" />
+                <line x1="306" y1="271" x2="322" y2="272" stroke="#E58E73" stroke-width="1.6" stroke-linecap="round" />
+              </g>
+              <g id="right-hand">
+                <path d="M 412 268 C 406 258, 386 252, 370 255 C 365 258, 366 277, 375 280 C 388 283, 405 286, 412 278 Z" fill="#FFBDA3" />
+                <line x1="369" y1="262" x2="387" y2="263" stroke="#E58E73" stroke-width="1.6" stroke-linecap="round" />
+                <line x1="369" y1="269" x2="387" y2="270" stroke="#E58E73" stroke-width="1.6" stroke-linecap="round" />
+                <line x1="371" y1="275" x2="386" y2="276" stroke="#E58E73" stroke-width="1.6" stroke-linecap="round" />
+              </g>
+
+              <path d="M 214 270 L 292 252 L 295 278 L 222 296 Z" fill="#fde68a" />
+              <path d="M 448 272 L 404 262 L 398 286 L 440 296 Z" fill="#fde68a" />
+            </g>
+          </g>
+
+          <!-- LAYER 4: INTERACTIVE FLOATING BADGES -->
+          <g id="speech-bubble-badge" class="float-node-1 svg-badge" onclick="generateAndPlay()">
+            <title>Tap to Speak</title>
+            <rect x="155" y="109" width="94" height="52" rx="26" fill="#f59e0b" />
+            <polygon points="228,158 249,161 242,140" fill="#f59e0b" />
+            <circle class="speech-dot-1" cx="179" cy="135" r="3.4" fill="#090705" />
+            <circle class="speech-dot-2" cx="194" cy="135" r="3.4" fill="#090705" />
+            <circle class="speech-dot-3" cx="209" cy="135" r="3.4" fill="#090705" />
+            <circle class="speech-dot-4" cx="224" cy="135" r="3.4" fill="#090705" />
+          </g>
+
+          <g class="float-node-2 svg-badge" onclick="cyclePresetLanguage()">
+            <title>Tap to Switch Language (SO / SV / EN / DE / AR / NO)</title>
+            <circle cx="174" cy="348" r="54" fill="#1b130c" stroke="#3c2718" stroke-width="2" />
+            <polygon points="139,326 174,304 209,326 209,375 139,375" fill="#92400e" />
+            <rect x="150" y="303" width="48" height="48" rx="3" fill="#fde68a" />
+            <line x1="158" y1="315" x2="190" y2="315" stroke="#d97706" stroke-width="2" stroke-linecap="round" />
+            <line x1="158" y1="323" x2="190" y2="323" stroke="#d97706" stroke-width="2" stroke-linecap="round" />
+            <line x1="158" y1="331" x2="190" y2="331" stroke="#d97706" stroke-width="2" stroke-linecap="round" />
+            <line x1="158" y1="339" x2="178" y2="339" stroke="#d97706" stroke-width="2" stroke-linecap="round" />
+            <path d="M 139 326 L 174 352 L 209 326 V 373 C 209 376 206.5 378 203.5 378 H 144.5 C 141.5 378 139 376 139 373 V 326 Z" fill="#f59e0b" />
+          </g>
+
+          <g class="float-node-3 svg-badge" onclick="cyclePlaybackRate()">
+            <title>Tap to Cycle Speed</title>
+            <circle cx="534" cy="166" r="54" fill="#1b130c" stroke="#3c2718" stroke-width="2" />
+            <path d="M 534 128 A 38 38 0 1 1 515 199 L 534 166 Z" fill="#f59e0b" />
+            <path d="M 515 199 A 38 38 0 0 1 501 147 L 534 166 Z" fill="#d97706" />
+            <path d="M 501 147 A 38 38 0 0 1 534 128 L 534 166 Z" fill="#78350f" />
+            <circle cx="534" cy="166" r="14" fill="#1b130c" />
+          </g>
+
+          <g class="float-node-4 svg-badge" onclick="toggleVoiceDropdown()">
+            <title>Tap to Select Neural Voice</title>
+            <circle cx="496" cy="368" r="54" fill="#1b130c" stroke="#3c2718" stroke-width="2" />
+            <path d="M 472 366 V 381 C 472 387, 484 392, 496 392 C 508 392, 520 387, 520 381 V 366 Z" fill="#b45309" />
+            <path d="M 472 366 V 381 C 472 387, 484 392, 496 392 V 366 Z" fill="#92400e" />
+            <polygon points="496,342 536,359 496,376 456,359" fill="#f59e0b" />
+            <polygon points="456,359 496,376 536,359 536,362 496,379 456,362" fill="#d97706" />
+            <ellipse cx="496" cy="359" rx="3" ry="1.8" fill="#78350f" />
+            <polyline points="496,359 519,369 519,394" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+            <circle cx="519" cy="395" r="3" fill="#fbbf24" />
+          </g>
+        </svg>
+
+        <div class="stage-badge-hint">
+          <i class="bi bi-hand-index-thumb"></i> Tap floating icons to speak, switch language, or change speed
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <audio id="coreAudio" preload="auto"></audio>
+
+  <script>
+    // ===================================================================
+    // VERCEL ENV / PROXY CONFIGURATION (No URLs Exposed in Frontend!)
+    // Calls /api/tts and /api/ping which read process.env.TTS_BACKEND_URL
+    // ===================================================================
+    const API_TTS_ENDPOINT = "/api/tts";
+    const API_PING_ENDPOINT = "/api/ping";
+
+    const audio = document.getElementById("coreAudio");
+    const scriptInput = document.getElementById("scriptInput");
+    let currentObjectUrl = null;
+    let selectedVoice = "sv-SE-MattiasNeural";
+    let selectedBadge = "SV • MATTIAS";
+    let mouthAnimInterval = null;
+
+    // 6 Supported Languages & Sample Scripts (Muktaryy Branded)
+    const LANGUAGE_PRESETS = {
+      so: {
+        text: "Asc, kusoo dhawoow istuudiyaha codka ee Muktaryy.",
+        voice: "so-SO-MuuseNeural",
+        label: "Muuse (Male) — Somali",
+        badge: "SO • MUUSE",
+        rtl: false
+      },
+      sv: {
+        text: "Välkommen till din muntliga övning. Lyssna noga och upprepa.",
+        voice: "sv-SE-MattiasNeural",
+        label: "Mattias (Male) — Swedish",
+        badge: "SV • MATTIAS",
+        rtl: false
+      },
+      en: {
+        text: "Welcome to Muktaryy Voice Studio. Type any sentence to begin.",
+        voice: "en-GB-RyanNeural",
+        label: "Ryan (UK Male) — English",
+        badge: "EN • RYAN",
+        rtl: false
+      },
+      de: {
+        text: "Willkommen im Sprachstudio. Hören Sie gut zu und sprechen Sie nach.",
+        voice: "de-DE-ConradNeural",
+        label: "Conrad (Male) — German",
+        badge: "DE • CONRAD",
+        rtl: false
+      },
+      ar: {
+        text: "مرحباً بكم في استوديو الصوت الذكي، اكتب أي نص للاستماع إليه بوضوح.",
+        voice: "ar-SA-HamedNeural",
+        label: "Hamed (Male) — Arabic",
+        badge: "AR • HAMED",
+        rtl: true
+      },
+      no: {
+        text: "Velkommen til språkstudioet. Lytt nøye til uttalen og øv deg.",
+        voice: "nb-NO-FinnNeural",
+        label: "Finn (Male) — Norwegian",
+        badge: "NO • FINN",
+        rtl: false
+      }
+    };
+
+    const presetOrder = ['sv', 'so', 'en', 'de', 'ar', 'no'];
+    let currentPresetIdx = 0;
+
+    // --- Custom Dropdown Logic ---
+    const voiceTrigger = document.getElementById("voiceTrigger");
+    const voiceMenu = document.getElementById("voiceMenu");
+    const selectedVoiceText = document.getElementById("selectedVoiceText");
+    const activeVoiceBadge = document.getElementById("activeVoiceBadge");
+    const dropdownItems = document.querySelectorAll(".dropdown-item");
+
+    function toggleVoiceDropdown() {
+      const isOpen = voiceMenu.classList.contains("show");
+      if (isOpen) {
+        closeVoiceDropdown();
+      } else {
+        voiceMenu.classList.add("show");
+        voiceTrigger.classList.add("open");
+      }
+    }
+
+    function closeVoiceDropdown() {
+      voiceMenu.classList.remove("show");
+      voiceTrigger.classList.remove("open");
+    }
+
+    function selectVoice(val, label, badge, isRtl) {
+      selectedVoice = val;
+      selectedBadge = badge || "STUDIO VOICE";
+      selectedVoiceText.innerText = label;
+      activeVoiceBadge.innerText = selectedBadge;
+      scriptInput.setAttribute("dir", isRtl ? "rtl" : "ltr");
+
+      dropdownItems.forEach(item => {
+        if (item.dataset.value === val) {
+          item.classList.add("selected");
+        } else {
+          item.classList.remove("selected");
+        }
+      });
+      closeVoiceDropdown();
+    }
+
+    dropdownItems.forEach(item => {
+      item.addEventListener("click", () => {
+        const isRtl = item.dataset.rtl === "true";
+        selectVoice(item.dataset.value, item.dataset.label, item.dataset.badge, isRtl);
+      });
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest("#voiceDropdownGroup") && !e.target.closest(".float-node-4")) {
+        closeVoiceDropdown();
+      }
+    });
+
+    // --- Playback Speed Control ---
+    const speedCycle = [1.0, 1.25, 1.5, 0.75];
+    let speedIndex = 0;
+
+    function cyclePlaybackRate() {
+      speedIndex = (speedIndex + 1) % speedCycle.length;
+      const newRate = speedCycle[speedIndex];
+      audio.playbackRate = newRate;
+      document.getElementById("speedValueLabel").innerText = `${newRate}×`;
+      const status = document.getElementById("statusMessage");
+      status.innerText = `Playback speed: ${newRate}×`;
+      status.style.color = "var(--primary)";
+    }
+
+    // --- Ping Studio Proxy ---
+    async function checkStudioHealth() {
+      const pingVal = document.getElementById("pingValue");
+      const pingDot = document.getElementById("pingDot");
+      const avatarDot = document.getElementById("avatarDot");
+      const start = Date.now();
+      try {
+        const res = await fetch(API_PING_ENDPOINT, { method: "GET" });
+        if (res.ok) {
+          const latency = Date.now() - start;
+          pingVal.innerText = `${latency}ms`;
+        } else {
+          pingVal.innerText = "Online";
+        }
+      } catch (e) {
+        pingVal.innerText = "Ready";
+        pingDot.style.background = "var(--green)";
+        avatarDot.style.background = "var(--green)";
+      }
+    }
+    checkStudioHealth();
+
+    // --- Script Input Counter ---
+    scriptInput.addEventListener("input", () => {
+      document.getElementById("charCount").innerText = `${scriptInput.value.length} chars`;
+    });
+
+    function clearText() {
+      scriptInput.value = "";
+      document.getElementById("charCount").innerText = "0 chars";
+      audio.pause();
+      scriptInput.focus();
+    }
+
+    // --- 6-Language Preset Switcher ---
+    function applyPreset(lang, btnEl) {
+      const preset = LANGUAGE_PRESETS[lang];
+      if (!preset) return;
+
+      document.querySelectorAll(".preset-chip").forEach(c => c.classList.remove("active"));
+      if (btnEl) btnEl.classList.add("active");
+
+      document.querySelectorAll(".header-nav a").forEach(a => a.classList.remove("active"));
+      const navItem = document.getElementById(`nav-${lang}`);
+      if (navItem) navItem.classList.add("active");
+
+      scriptInput.value = preset.text;
+      selectVoice(preset.voice, preset.label, preset.badge, preset.rtl);
+      currentPresetIdx = presetOrder.indexOf(lang);
+      document.getElementById("charCount").innerText = `${scriptInput.value.length} chars`;
+    }
+
+    function triggerPresetClick(lang) {
+      const chip = document.getElementById(`chip-${lang}`);
+      applyPreset(lang, chip);
+    }
+
+    function cyclePresetLanguage() {
+      currentPresetIdx = (currentPresetIdx + 1) % presetOrder.length;
+      const nextLang = presetOrder[currentPresetIdx];
+      triggerPresetClick(nextLang);
+    }
+
+    function toggleFloatAnim() {
+      const svg = document.getElementById("online-learning-svg");
+      svg.classList.toggle("anim-enabled");
+      const isOn = svg.classList.contains("anim-enabled");
+      document.getElementById("motionLabel").textContent = isOn ? "Motion" : "Paused";
+    }
+
+    // --- SVG Lip-Sync & Equalizer Visuals ---
+    function startSpeakingVisuals() {
+      const idleMouth = document.getElementById("teacher-mouth-idle");
+      const talkMouth = document.getElementById("teacher-mouth-talk");
+      const bubble = document.getElementById("speech-bubble-badge");
+      const eq = document.getElementById("eqVisualizer");
+
+      if (idleMouth && talkMouth) {
+        idleMouth.classList.add("hidden");
+        talkMouth.classList.remove("hidden");
+      }
+      if (bubble) bubble.classList.add("speaking-active");
+      if (eq) eq.classList.add("speaking-bars");
+
+      clearInterval(mouthAnimInterval);
+      mouthAnimInterval = setInterval(() => {
+        if (talkMouth) {
+          const openRy = (1.2 + Math.random() * 2.8).toFixed(2);
+          const openRx = (4.0 + Math.random() * 1.4).toFixed(2);
+          talkMouth.setAttribute("ry", openRy);
+          talkMouth.setAttribute("rx", openRx);
+        }
+      }, 110);
+    }
+
+    function stopSpeakingVisuals() {
+      const idleMouth = document.getElementById("teacher-mouth-idle");
+      const talkMouth = document.getElementById("teacher-mouth-talk");
+      const bubble = document.getElementById("speech-bubble-badge");
+      const eq = document.getElementById("eqVisualizer");
+
+      clearInterval(mouthAnimInterval);
+      if (talkMouth && idleMouth) {
+        talkMouth.classList.add("hidden");
+        idleMouth.classList.remove("hidden");
+      }
+      if (bubble) bubble.classList.remove("speaking-active");
+      if (eq) eq.classList.remove("speaking-bars");
+    }
+
+    // --- Generate Audio via Hidden Vercel Proxy Endpoint ---
+    async function generateAndPlay() {
+      const text = scriptInput.value.trim();
+      const voice = selectedVoice;
+      const genBtn = document.getElementById("generateBtn");
+      const status = document.getElementById("statusMessage");
+      const playerCard = document.getElementById("playerCard");
+
+      if (!text) {
+        status.innerText = "Please enter some text first.";
+        status.style.color = "#ef4444";
+        scriptInput.focus();
+        return;
+      }
+
+      genBtn.disabled = true;
+      genBtn.innerHTML = `<i class="bi bi-arrow-repeat spin-icon"></i> Synthesizing...`;
+      status.innerText = `Synthesizing ${selectedBadge}...`;
+      status.style.color = "var(--primary)";
+
+      const queryUrl = `${API_TTS_ENDPOINT}?text=${encodeURIComponent(text)}&voice=${encodeURIComponent(voice)}&rate=%2B0%25&pitch=%2B0Hz`;
+
+      try {
+        const response = await fetch(queryUrl);
+        if (!response.ok) {
+          const errText = await response.text();
+          throw new Error(errText || `Studio error ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+        currentObjectUrl = URL.createObjectURL(blob);
+
+        audio.src = currentObjectUrl;
+        audio.playbackRate = speedCycle[speedIndex];
+
+        document.getElementById("downloadBtn").href = currentObjectUrl;
+        document.getElementById("currentVoiceLabel").innerText = selectedBadge;
+
+        playerCard.classList.add("active");
+        status.innerText = `✓ Audio ready (${Math.round(blob.size / 1024)} KB)`;
+        status.style.color = "var(--green)";
+
+        await audio.play();
+      } catch (err) {
+        console.error(err);
+        status.innerText = `❌ Ensure TTS_BACKEND_URL is set in Vercel Env.`;
+        status.style.color = "#ef4444";
+        stopSpeakingVisuals();
+      } finally {
+        genBtn.disabled = false;
+        genBtn.innerHTML = `<i class="bi bi-play-circle-fill"></i> Generate &amp; Play`;
+      }
+    }
+
+    // --- Audio Player Controls ---
+    const playIcon = document.getElementById("playIcon");
+    const seekSlider = document.getElementById("seekSlider");
+    const currentTimeText = document.getElementById("currentTime");
+    const durationTimeText = document.getElementById("durationTime");
+
+    function togglePlay() {
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
+    }
+
+    audio.addEventListener("play", () => {
+      playIcon.className = "bi bi-pause-fill";
+      startSpeakingVisuals();
+    });
+
+    audio.addEventListener("pause", () => {
+      playIcon.className = "bi bi-play-fill";
+      stopSpeakingVisuals();
+    });
+
+    audio.addEventListener("ended", () => {
+      playIcon.className = "bi bi-play-fill";
+      stopSpeakingVisuals();
+    });
+
+    audio.addEventListener("timeupdate", () => {
+      if (!isNaN(audio.duration)) {
+        seekSlider.value = (audio.currentTime / audio.duration) * 100;
+        currentTimeText.innerText = formatTime(audio.currentTime);
+      }
+    });
+
+    audio.addEventListener("loadedmetadata", () => {
+      durationTimeText.innerText = formatTime(audio.duration);
+      seekSlider.value = 0;
+    });
+
+    seekSlider.addEventListener("input", () => {
+      if (!isNaN(audio.duration)) {
+        audio.currentTime = (seekSlider.value / 100) * audio.duration;
+      }
+    });
+
+    function formatTime(seconds) {
+      if (isNaN(seconds)) return "0:00";
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+  </script>
+</body>
+</html>
